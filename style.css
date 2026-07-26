@@ -60,13 +60,6 @@ html, body {
   gap: 10px;
 }
 
-.leaf {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 3px rgba(64,53,42,0.15));
-}
-
 h1 {
   margin: 0;
   font-size: 19px;
@@ -132,6 +125,54 @@ h1 {
   border-color: #A84739;
 }
 
+.infobtn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.infodialog {
+  border: none;
+  border-radius: 16px;
+  padding: 18px 20px 16px;
+  max-width: 340px;
+  width: calc(100% - 40px);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-lift);
+  font-family: inherit;
+}
+.infodialog::backdrop { background: rgba(64, 53, 42, 0.35); }
+.infodialog h2 { margin: 0 0 10px; font-size: 16px; color: var(--wood-dark); }
+.infodialog ul { margin: 0 0 14px; padding-left: 18px; font-size: 12.5px; line-height: 1.5; }
+.infodialog li { margin-bottom: 8px; }
+.infodialog li:last-child { margin-bottom: 0; }
+.infoclose {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+  background: var(--wood);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 /* ── Board shell: pool strip on top, week table filling the rest ── */
 
 .boardwrap {
@@ -168,14 +209,6 @@ h1 {
 .col.pool .colhead {
   flex-shrink: 0;
   padding-bottom: 4px;
-}
-
-.col.pool .hint {
-  margin: 1px 0 6px;
-  font-size: 10.5px;
-  color: var(--ink-soft);
-  font-weight: 500;
-  line-height: 1.3;
 }
 
 .col.pool .itemlist {
@@ -270,6 +303,9 @@ h1 {
   box-shadow: var(--shadow);
   animation: pop .16s ease;
   touch-action: none; /* the whole chip is the drag surface now */
+  -webkit-touch-callout: none; /* suppress iOS's press-and-hold callout menu */
+  -webkit-user-select: none;
+  user-select: none;
   cursor: grab;
 }
 .card:active { cursor: grabbing; }
@@ -319,9 +355,9 @@ h1 {
 body.delete-mode .card { cursor: pointer; }
 body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba(192, 91, 77, .18); }
 
-/* ── Drag ghost: pinned at top-center, swings like a hung tag ──
-   Outer tracks the pointer 1:1 (no easing); inner rotates with a
-   transition so rapid pointer moves produce a lagging pendulum swing. */
+/* ── Drag ghost: tracks the pointer with no easing/lag — a lifted
+   chip centered exactly on the pointer (offset upward on touch, via
+   the outer wrapper's position, so a finger doesn't hide it). ── */
 
 .ghost {
   position: fixed;
@@ -335,11 +371,10 @@ body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba
   position: absolute;
   left: 0;
   top: 0;
-  transform-origin: top center;
-  transform: translate(-50%, 0) rotate(0deg);
-  transition: transform 160ms cubic-bezier(.34, 1.35, .4, 1), background .12s ease, border-color .12s ease;
+  transform: translate(-50%, -50%) scale(1.08);
+  transition: background .12s ease, border-color .12s ease;
   box-shadow: var(--shadow-lift);
-  opacity: .96;
+  opacity: .97;
 }
 
 /* Held outside the board: signals that releasing here dissolves it. */
@@ -355,7 +390,6 @@ body.dnd-active .itemtext { user-select: none; }
 
 @media (max-width: 480px) {
   h1 { font-size: 16px; }
-  .leaf { width: 28px; height: 28px; }
   .remember { font-size: 10.5px; padding: 5px 9px; }
   .daycanvas .colhead h2 { font-size: 9.5px; }
   .daycanvas .colhead .date { display: none; }

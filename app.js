@@ -89,6 +89,7 @@ function loadState() {
   }
 }
 
+const isFirstVisit = !localStorage.getItem(STORAGE_KEY);
 let state = loadState();
 
 function saveState() {
@@ -228,16 +229,23 @@ function onDeleteItem(id) {
    edit, or delete it if delete mode is armed) from a drag (-> movement
    past a small threshold). Dropping onto a day places the chip exactly
    where it's released — no snapping to a list. Dropping outside the
-   board entirely dissolves the task. While dragging, the chip swings
-   from a "pin" at its top-center: the outer wrapper tracks the pointer
-   1:1, the inner note rotates with a lagging CSS transition. */
+   board entirely dissolves the task.
+
+   The dragged chip tracks the pointer with no easing (an earlier
+   version had it swing from a "pinned" point, which reads as sluggish
+   on touch — direct 1:1 tracking feels far more responsive). On touch,
+   the chip is drawn above the finger so it isn't hidden underneath it;
+   hit-testing and the final drop position still use the real touch
+   point, not the visually-lifted one. The drop position itself comes
+   from the last pointermove, not the pointerup event — touchend
+   coordinates can drift a few pixels as a finger actually lifts off
+   the glass, which otherwise lands the chip slightly off target. */
 
 let pending = null;
 let dragState = null;
 let deleteMode = false;
 const DRAG_THRESHOLD = 6;
-const SWING_SENSITIVITY = 2.2;
-const SWING_MAX_DEG = 26;
+const TOUCH_LIFT_Y = 36; // px the ghost is drawn above a touch point
 
 function onCardPointerDown(e, itemId) {
   if (deleteMode) e.preventDefault(); // block native input focus while armed
@@ -270,40 +278,40 @@ function onPendingUp() {
 function startDrag(itemId, card, e) {
   if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
   const rect = card.getBoundingClientRect();
+  const liftY = e.pointerType === "touch" ? TOUCH_LIFT_Y : 0;
 
   const ghost = document.createElement("div");
   ghost.className = "ghost";
-  ghost.style.left = e.clientX + "px";
-  ghost.style.top = e.clientY + "px";
 
   const inner = card.cloneNode(true);
   inner.className = "card ghost-inner" + (card.classList.contains("note") ? " note" : "");
-  inner.style.left = "0";
-  inner.style.top = "0";
   inner.style.width = rect.width + "px";
-  inner.style.transform = "translate(-50%, 0) rotate(0deg)"; // reset whatever the source card's transform was
   ghost.appendChild(inner);
   document.body.appendChild(ghost);
 
   card.classList.add("dragging-source");
   document.body.classList.add("dnd-active");
 
-  dragState = { itemId, ghost, inner, lastX: e.clientX, targetDay: null };
+  dragState = { itemId, ghost, inner, liftY, lastX: e.clientX, lastY: e.clientY, targetDay: null };
+  positionGhost(e.clientX, e.clientY);
 
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("pointerup", onPointerUp);
 }
 
+function positionGhost(x, y) {
+  dragState.ghost.style.left = x + "px";
+  dragState.ghost.style.top = (y - dragState.liftY) + "px";
+}
+
 function onPointerMove(e) {
   if (!dragState) return;
-  dragState.ghost.style.left = e.clientX + "px";
-  dragState.ghost.style.top = e.clientY + "px";
-
-  const deltaX = e.clientX - dragState.lastX;
   dragState.lastX = e.clientX;
-  const angle = clamp(deltaX * SWING_SENSITIVITY, -SWING_MAX_DEG, SWING_MAX_DEG);
-  dragState.inner.style.transform = `translate(-50%, 0) rotate(${angle}deg)`;
+  dragState.lastY = e.clientY;
+  positionGhost(e.clientX, e.clientY);
 
+  // Hit-testing always uses the real pointer position, not the
+  // visually-lifted ghost, so the drop target matches your finger.
   const under = document.elementFromPoint(e.clientX, e.clientY);
   const col = under && under.closest(".col, .daycanvas");
   document.querySelectorAll(".drag-over").forEach((c) => c.classList.remove("drag-over"));
@@ -312,9 +320,9 @@ function onPointerMove(e) {
   dragState.inner.classList.toggle("ghost-void", !col); // outside the board -> about to dissolve
 }
 
-function onPointerUp(e) {
+function onPointerUp() {
   if (!dragState) return;
-  const { itemId, targetDay, ghost, inner } = dragState;
+  const { itemId, targetDay, ghost, inner, lastX, lastY } = dragState;
 
   document.querySelectorAll(".drag-over").forEach((c) => c.classList.remove("drag-over"));
   document.body.classList.remove("dnd-active");
@@ -324,16 +332,17 @@ function onPointerUp(e) {
   if (targetDay === "pool") {
     delete state.assignments[itemId];
     saveState();
-    settleSwing(inner, ghost);
+    ghost.remove();
   } else if (targetDay) {
-    // Land exactly where the pointer let go — no snapping into a list.
+    // Land exactly where the pointer last was seen (see note above on
+    // why the pointerup event's own coordinates aren't used here).
     const canvas = document.querySelector(`.canvas[data-day="${CSS.escape(targetDay)}"]`);
     const rect = canvas.getBoundingClientRect();
-    const x = clamp(((e.clientX - rect.left) / rect.width) * 100, PLACE_MIN, PLACE_MAX);
-    const y = clamp(((e.clientY - rect.top) / rect.height) * 100, PLACE_MIN, PLACE_MAX);
+    const x = clamp(((lastX - rect.left) / rect.width) * 100, PLACE_MIN, PLACE_MAX);
+    const y = clamp(((lastY - rect.top) / rect.height) * 100, PLACE_MIN, PLACE_MAX);
     state.assignments[itemId] = { day: targetDay, x, y };
     saveState();
-    settleSwing(inner, ghost);
+    ghost.remove();
   } else {
     // Dropped outside the board entirely — dissolve it.
     state.items = state.items.filter((x) => x.id !== itemId);
@@ -347,15 +356,10 @@ function onPointerUp(e) {
   render();
 }
 
-function settleSwing(inner, ghost) {
-  inner.style.transform = "translate(-50%, 0) rotate(0deg)";
-  setTimeout(() => ghost.remove(), 160);
-}
-
 function dissolveGhost(inner, ghost) {
   inner.style.transition = "transform 180ms ease, opacity 180ms ease";
   inner.style.opacity = "0";
-  inner.style.transform = "translate(-50%, 0) scale(.4)";
+  inner.style.transform = "translate(-50%, -50%) scale(.4)";
   setTimeout(() => ghost.remove(), 190);
 }
 
@@ -378,8 +382,17 @@ deleteBtn.addEventListener("click", () => {
   document.body.classList.toggle("delete-mode", deleteMode);
 });
 
+/* ── Info popup: explains the app, including the 4-char cap ── */
+
+const infoBtn = document.getElementById("infoBtn");
+const infoDialog = document.getElementById("infoDialog");
+const infoCloseBtn = document.getElementById("infoCloseBtn");
+infoBtn.addEventListener("click", () => infoDialog.showModal());
+infoCloseBtn.addEventListener("click", () => infoDialog.close());
+
 /* ── Init ───────────────────────────────────────────────── */
 
 checkWeekRollover();
 render();
 setInterval(checkWeekRollover, 60000);
+if (isFirstVisit) infoDialog.showModal(); // first-ever visit: explain up front

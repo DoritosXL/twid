@@ -1,0 +1,362 @@
+:root {
+  --bg: #F6F1E6;
+  --paper: #FFFDF9;
+  --wood: #A9805A;
+  --wood-dark: #7C5C3E;
+  --ink: #40352A;
+  --ink-soft: #8A7A69;
+  --line: #E6D9C4;
+  --card: #FFFFFF;
+  --card-line: #EADFCB;
+  --shadow: 0 2px 6px rgba(64, 53, 42, 0.08), 0 1px 2px rgba(64, 53, 42, 0.06);
+  --shadow-lift: 0 14px 26px rgba(64, 53, 42, 0.22), 0 4px 10px rgba(64, 53, 42, 0.14);
+
+  --mon-bg: #E3ECE1; --mon-accent: #6B9080;
+  --tue-bg: #E1E8EF; --tue-accent: #5C7A99;
+  --wed-bg: #F3E4D7; --wed-accent: #B8714F;
+  --thu-bg: #F4EBD3; --thu-accent: #B8923B;
+  --fri-bg: #EBE1EA; --fri-accent: #8E6C88;
+  --sat-bg: #E1E9E7; --sat-accent: #5E8A81;
+  --sun-bg: #ECE5DC; --sun-accent: #96795F;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* the app is one screen; only inner regions scroll */
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Quicksand', ui-rounded, 'Segoe UI Rounded', system-ui, -apple-system, sans-serif;
+}
+
+.wrap {
+  height: 100vh;
+  height: 100dvh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leaf {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 3px rgba(64,53,42,0.15));
+}
+
+h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--wood-dark);
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+}
+
+.weekrange {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.remember input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--wood);
+  cursor: pointer;
+}
+
+.topctrls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deletebtn {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.deletebtn.armed {
+  color: #fff;
+  background: #C05B4D;
+  border-color: #A84739;
+}
+
+/* ── Board shell: pool strip on top, week table filling the rest ── */
+
+.boardwrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--card-line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ── Pool: the growable task list, capped height + own scroll ── */
+
+.col.pool {
+  flex: 0 1 auto;
+  max-height: 32%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 8px;
+  border-bottom: 2px dashed var(--line);
+  min-height: 0;
+}
+
+.colhead h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.col.pool .colhead {
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+.col.pool .hint {
+  margin: 1px 0 6px;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.col.pool .itemlist {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+}
+
+/* ── Week table: the 7 days themselves wrap into rows, so each day
+   keeps a real dedicated width instead of being squeezed into a
+   single sliver — however many fit per row, they wrap responsively. */
+
+.weektable {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow-y: auto;
+}
+
+.daycanvas {
+  flex: 1 1 110px;
+  min-width: 100px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1.5px solid var(--line);
+  border-bottom: 1.5px solid var(--line);
+  transition: background .15s ease;
+}
+
+.daycanvas.drag-over { background: #FBF6EC; }
+.daycanvas.today { background: var(--accent-bg, var(--bg)); }
+
+.daycanvas .colhead {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 5px 2px 4px;
+  border-bottom: 3px solid var(--line);
+}
+.daycanvas .colhead h2 { font-size: 11px; }
+.daycanvas .colhead .date { font-size: 9px; font-weight: 600; color: var(--ink-soft); }
+
+.daycanvas.mon .colhead { border-bottom-color: var(--mon-accent); } .daycanvas.mon { --accent-bg: var(--mon-bg); }
+.daycanvas.tue .colhead { border-bottom-color: var(--tue-accent); } .daycanvas.tue { --accent-bg: var(--tue-bg); }
+.daycanvas.wed .colhead { border-bottom-color: var(--wed-accent); } .daycanvas.wed { --accent-bg: var(--wed-bg); }
+.daycanvas.thu .colhead { border-bottom-color: var(--thu-accent); } .daycanvas.thu { --accent-bg: var(--thu-bg); }
+.daycanvas.fri .colhead { border-bottom-color: var(--fri-accent); } .daycanvas.fri { --accent-bg: var(--fri-bg); }
+.daycanvas.sat .colhead { border-bottom-color: var(--sat-accent); } .daycanvas.sat { --accent-bg: var(--sat-bg); }
+.daycanvas.sun .colhead { border-bottom-color: var(--sun-accent); } .daycanvas.sun { --accent-bg: var(--sun-bg); }
+
+/* The drop surface: a freeform canvas. A chip lands exactly where the
+   pointer released it (as a % of this box, so it stays put across
+   resizes) — no snapping into a list. */
+.canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.empty-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* ── Cards ──────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--card);
+  border: 1.5px solid var(--card-line);
+  border-radius: 10px;
+  padding: 5px 6px;
+  box-shadow: var(--shadow);
+  animation: pop .16s ease;
+  touch-action: none; /* the whole chip is the drag surface now */
+  cursor: grab;
+}
+.card:active { cursor: grabbing; }
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Task chips on a day: dedicated fixed width (text is capped to 4
+   chars, so every chip is the same tidy size), pinned by its drop
+   point — the chip's center sits exactly where it was released. */
+.card.note {
+  position: absolute;
+  width: 40px;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+  padding: 5px 3px;
+  z-index: 1;
+}
+.card.note .itemtext {
+  width: auto;
+  text-align: center;
+  font-size: 12px;
+  padding: 1px 0;
+}
+
+.card.dragging-source { opacity: .3; }
+
+.itemtext {
+  flex: none;
+  width: 52px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 5px 2px;
+  outline: none;
+  border-radius: 6px;
+}
+.itemtext::placeholder { color: var(--ink-soft); font-weight: 500; }
+.itemtext:focus { background: #FBF6EC; }
+
+/* Delete mode: signal that tapping a chip now removes it. */
+body.delete-mode .card { cursor: pointer; }
+body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba(192, 91, 77, .18); }
+
+/* ── Drag ghost: pinned at top-center, swings like a hung tag ──
+   Outer tracks the pointer 1:1 (no easing); inner rotates with a
+   transition so rapid pointer moves produce a lagging pendulum swing. */
+
+.ghost {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.ghost-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top center;
+  transform: translate(-50%, 0) rotate(0deg);
+  transition: transform 160ms cubic-bezier(.34, 1.35, .4, 1), background .12s ease, border-color .12s ease;
+  box-shadow: var(--shadow-lift);
+  opacity: .96;
+}
+
+/* Held outside the board: signals that releasing here dissolves it. */
+.ghost-inner.ghost-void {
+  background: #F8DFDA;
+  border-color: #E0A79B;
+}
+
+body.dnd-active, body.dnd-active * { cursor: grabbing !important; }
+body.dnd-active .itemtext { user-select: none; }
+
+/* ── Small screens: shrink further, same one-screen shell ───── */
+
+@media (max-width: 480px) {
+  h1 { font-size: 16px; }
+  .leaf { width: 28px; height: 28px; }
+  .remember { font-size: 10.5px; padding: 5px 9px; }
+  .daycanvas .colhead h2 { font-size: 9.5px; }
+  .daycanvas .colhead .date { display: none; }
+}

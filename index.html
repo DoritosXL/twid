@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>twid — this week I do</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <svg class="leaf" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 38C10 22 22 10 38 10C38 26 26 38 10 38Z" fill="#88A891"/>
+        <path d="M10 38C16 30 24 22 38 10" stroke="#5C7A63" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1 title="this week I do">twid</h1>
+        <p class="weekrange" id="weekRange">&nbsp;</p>
+      </div>
+    </div>
+
+    <div class="topctrls">
+      <label class="remember" title="When checked, next week keeps this week's layout. When unchecked, every new week starts empty again.">
+        <input type="checkbox" id="rememberToggle">
+        <span>Remember layout</span>
+      </label>
+
+      <button type="button" id="deleteModeBtn" class="deletebtn" aria-pressed="false"
+        title="Tap on to arm — then tap any task to delete it.">Delete</button>
+    </div>
+  </header>
+
+  <div class="boardwrap">
+    <section class="col pool" data-day="pool">
+      <div class="colhead">
+        <h2>Tasks</h2>
+        <p class="hint">Type a task, then drag it anywhere on a day</p>
+      </div>
+      <div class="itemlist" id="poolList"></div>
+    </section>
+
+    <div class="weektable" id="weekTable"></div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

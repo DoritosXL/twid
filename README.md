@@ -1,14 +1,16 @@
 # twid
 
-*This Week I Do* — a tiny, self-contained weekly task board inspired by the
-Montessori idea of
-letting kids build their own mental model of "what happens when" — instead of
-holding the whole week in your head, you write short tasks down and place
-each one on the day it belongs to.
+*This Week I Do* — a tiny weekly task board inspired by the Montessori idea
+of letting kids build their own mental model of "what happens when" —
+instead of holding the whole week in your head, you write short tasks down
+and place each one on the day it belongs to.
 
-No build step, no framework, no dependencies: just `index.html`, `style.css`,
-and `app.js`. Open `index.html` directly in a browser, or serve the folder
-with any static file server.
+> This branch (`react-rewrite`) is a rebuild of the original static
+> HTML/CSS/JS version (still on `main`) using React + TypeScript + Vite and
+> [dnd-kit](https://dndkit.com/) for drag-and-drop. The original was fully
+> hand-rolled with raw Pointer Events, which worked but accumulated a class
+> of bugs (touch coordinate drift on drop, drag-ghost sizing/positioning)
+> that a proven DnD library solves for free.
 
 ## How it works
 
@@ -29,19 +31,28 @@ with any static file server.
 
 ## Tech
 
-Plain HTML/CSS/JS. Drag-and-drop is implemented with Pointer Events (works
-with mouse, touch, and pen) rather than the native HTML5 Drag and Drop API,
-for more control over the drag visuals (the chip swings from a "pinned"
-top-center point while you drag it) and better mobile behavior.
+React 19 + TypeScript, built with Vite. Drag-and-drop uses
+[`@dnd-kit/core`](https://dndkit.com/) with a `PointerSensor` (unifies mouse
+and touch, and its activation-distance constraint is what distinguishes a
+tap-to-edit from a drag). Chip placement is computed from the draggable's
+own tracked rect relative to the drop target, not raw event coordinates —
+which is what makes drops land exactly where released, even on touch.
+
+```
+src/
+  lib/          pure helpers: date/week math, shared types
+  hooks/        useTwidState — state + localStorage persistence + weekly rollover
+  components/   Header, Pool, WeekTable, DayCanvas, TaskChip, InfoDialog
+```
 
 ## Running locally
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+npm install
+npm run dev       # dev server with HMR
+npm run build     # typecheck + production build to dist/
+npm run preview   # serve the production build locally
 ```
-
-or simply open `index.html` in a browser — no server required.
 
 ## License
 

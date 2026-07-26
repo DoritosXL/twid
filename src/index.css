@@ -22,10 +22,13 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+html, body {
   overflow: hidden; /* the app is one screen; only inner regions scroll */
   background: var(--bg);
   color: var(--ink);
@@ -187,21 +190,23 @@ h1 {
   overflow: hidden;
 }
 
-/* ── Pool: the growable task list, capped height + own scroll ── */
+/* ── Pool: the growable task list, fixed height share + own scroll ── */
 
 .col.pool {
   /* Fixed share of the board's height (not content-sized): if the pool
      grew/shrank with its own row count, the week table below would
      resize too, and every already-placed chip's %-based position
-     would shift, since it's relative to a canvas whose pixel size just
-     changed under it. */
+     would shift, since it's relative to a canvas whose pixel size
+     just changed under it. */
   flex: 0 0 32%;
   display: flex;
   flex-direction: column;
   padding: 8px 12px 8px;
   border-bottom: 2px dashed var(--line);
   min-height: 0;
+  transition: background .15s ease;
 }
+.col.pool.drag-over { background: #FBF6EC; }
 
 .colhead h2 {
   margin: 0;
@@ -305,19 +310,14 @@ h1 {
   border-radius: 10px;
   padding: 5px 6px;
   box-shadow: var(--shadow);
-  animation: pop .16s ease;
-  touch-action: none; /* the whole chip is the drag surface now */
+  touch-action: none; /* the whole chip is the drag surface */
   -webkit-touch-callout: none; /* suppress iOS's press-and-hold callout menu */
   -webkit-user-select: none;
   user-select: none;
   cursor: grab;
 }
 .card:active { cursor: grabbing; }
-
-@keyframes pop {
-  from { opacity: 0; transform: scale(.92); }
-  to { opacity: 1; transform: scale(1); }
-}
+.card.dragging-source { opacity: .3; }
 
 /* Task chips on a day: dedicated fixed width (text is capped to 4
    chars, so every chip is the same tidy size), pinned by its drop
@@ -336,8 +336,6 @@ h1 {
   font-size: 12px;
   padding: 1px 0;
 }
-
-.card.dragging-source { opacity: .3; }
 
 .itemtext {
   flex: none;
@@ -359,35 +357,19 @@ h1 {
 body.delete-mode .card { cursor: pointer; }
 body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba(192, 91, 77, .18); }
 
-/* ── Drag ghost: tracks the pointer with no easing/lag, at its
-   normal size, centered exactly on the pointer/finger. ── */
-
-.ghost {
-  position: fixed;
-  z-index: 1000;
-  pointer-events: none;
-  width: 0;
-  height: 0;
-}
+/* ── Drag overlay content: dnd-kit's <DragOverlay> already tracks the
+   pointer 1:1 and matches the dragged chip's size/position — we only
+   style the visual (lift + the "about to dissolve" cue). ── */
 
 .ghost-inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform: translate(-50%, -50%);
-  transition: background .12s ease, border-color .12s ease;
   box-shadow: var(--shadow-lift);
   opacity: .97;
+  transition: background .12s ease, border-color .12s ease;
 }
-
-/* Held outside the board: signals that releasing here dissolves it. */
 .ghost-inner.ghost-void {
   background: #F8DFDA;
   border-color: #E0A79B;
 }
-
-body.dnd-active, body.dnd-active * { cursor: grabbing !important; }
-body.dnd-active .itemtext { user-select: none; }
 
 /* ── Small screens: shrink further, same one-screen shell ───── */
 

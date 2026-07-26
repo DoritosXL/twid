@@ -193,12 +193,13 @@ h1 {
 /* ── Pool: the growable task list, fixed height share + own scroll ── */
 
 .col.pool {
-  /* Fixed share of the board's height (not content-sized): if the pool
-     grew/shrank with its own row count, the week table below would
-     resize too, and every already-placed chip's %-based position
-     would shift, since it's relative to a canvas whose pixel size
-     just changed under it. */
-  flex: 0 0 32%;
+  /* Fixed pixel height, not content-sized or a % of the board: sized
+     for exactly 2 rows of chips (~7-8 at typical phone width) with its
+     own scroll beyond that. A content-sized or %-based height would
+     change the week table's available height as the pool grows/shrinks,
+     which shifts every already-placed chip's %-based position, since
+     it's relative to a canvas whose pixel size just changed under it. */
+  flex: 0 0 128px;
   display: flex;
   flex-direction: column;
   padding: 8px 12px 8px;

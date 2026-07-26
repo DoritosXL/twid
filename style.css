@@ -355,9 +355,8 @@ h1 {
 body.delete-mode .card { cursor: pointer; }
 body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba(192, 91, 77, .18); }
 
-/* ── Drag ghost: tracks the pointer with no easing/lag — a lifted
-   chip centered exactly on the pointer (offset upward on touch, via
-   the outer wrapper's position, so a finger doesn't hide it). ── */
+/* ── Drag ghost: tracks the pointer with no easing/lag, at its
+   normal size, centered exactly on the pointer/finger. ── */
 
 .ghost {
   position: fixed;
@@ -371,7 +370,7 @@ body.delete-mode .card:hover { border-color: #C05B4D; box-shadow: 0 0 0 2px rgba
   position: absolute;
   left: 0;
   top: 0;
-  transform: translate(-50%, -50%) scale(1.08);
+  transform: translate(-50%, -50%);
   transition: background .12s ease, border-color .12s ease;
   box-shadow: var(--shadow-lift);
   opacity: .97;

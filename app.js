@@ -231,21 +231,19 @@ function onDeleteItem(id) {
    where it's released — no snapping to a list. Dropping outside the
    board entirely dissolves the task.
 
-   The dragged chip tracks the pointer with no easing (an earlier
-   version had it swing from a "pinned" point, which reads as sluggish
-   on touch — direct 1:1 tracking feels far more responsive). On touch,
-   the chip is drawn above the finger so it isn't hidden underneath it;
-   hit-testing and the final drop position still use the real touch
-   point, not the visually-lifted one. The drop position itself comes
-   from the last pointermove, not the pointerup event — touchend
-   coordinates can drift a few pixels as a finger actually lifts off
-   the glass, which otherwise lands the chip slightly off target. */
+   The dragged chip tracks the pointer with no easing and no scaling —
+   it stays exactly under the finger/cursor at its normal size (an
+   earlier version swung from a "pinned" point and lifted above touch,
+   both of which read as wrong — direct 1:1 tracking at true size is
+   what actually feels right). The drop position comes from the last
+   pointermove, not the pointerup event — touchend coordinates can
+   drift a few pixels as a finger actually lifts off the glass, which
+   otherwise lands the chip slightly off target. */
 
 let pending = null;
 let dragState = null;
 let deleteMode = false;
 const DRAG_THRESHOLD = 6;
-const TOUCH_LIFT_Y = 36; // px the ghost is drawn above a touch point
 
 function onCardPointerDown(e, itemId) {
   if (deleteMode) e.preventDefault(); // block native input focus while armed
@@ -278,7 +276,6 @@ function onPendingUp() {
 function startDrag(itemId, card, e) {
   if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
   const rect = card.getBoundingClientRect();
-  const liftY = e.pointerType === "touch" ? TOUCH_LIFT_Y : 0;
 
   const ghost = document.createElement("div");
   ghost.className = "ghost";
@@ -292,7 +289,7 @@ function startDrag(itemId, card, e) {
   card.classList.add("dragging-source");
   document.body.classList.add("dnd-active");
 
-  dragState = { itemId, ghost, inner, liftY, lastX: e.clientX, lastY: e.clientY, targetDay: null };
+  dragState = { itemId, ghost, inner, lastX: e.clientX, lastY: e.clientY, targetDay: null };
   positionGhost(e.clientX, e.clientY);
 
   window.addEventListener("pointermove", onPointerMove);
@@ -301,7 +298,7 @@ function startDrag(itemId, card, e) {
 
 function positionGhost(x, y) {
   dragState.ghost.style.left = x + "px";
-  dragState.ghost.style.top = (y - dragState.liftY) + "px";
+  dragState.ghost.style.top = y + "px";
 }
 
 function onPointerMove(e) {
@@ -310,8 +307,6 @@ function onPointerMove(e) {
   dragState.lastY = e.clientY;
   positionGhost(e.clientX, e.clientY);
 
-  // Hit-testing always uses the real pointer position, not the
-  // visually-lifted ghost, so the drop target matches your finger.
   const under = document.elementFromPoint(e.clientX, e.clientY);
   const col = under && under.closest(".col, .daycanvas");
   document.querySelectorAll(".drag-over").forEach((c) => c.classList.remove("drag-over"));

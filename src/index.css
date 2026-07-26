@@ -334,7 +334,12 @@ h1 {
   z-index: 1;
 }
 .card.note .itemtext {
-  width: auto;
+  /* Plain <input> defaults to an intrinsic width (~20ch) when
+     unconstrained, and flex:none (inherited from .itemtext) keeps the
+     flex layout from shrinking it back down — invisible while
+     unfocused (no visible edge), but :focus paints its true, much
+     wider background. Fill the chip's own width instead. */
+  width: 100%;
   text-align: center;
   font-size: 13px;
   padding: 1px 0;

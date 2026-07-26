@@ -190,8 +190,12 @@ h1 {
 /* ── Pool: the growable task list, capped height + own scroll ── */
 
 .col.pool {
-  flex: 0 1 auto;
-  max-height: 32%;
+  /* Fixed share of the board's height (not content-sized): if the pool
+     grew/shrank with its own row count, the week table below would
+     resize too, and every already-placed chip's %-based position
+     would shift, since it's relative to a canvas whose pixel size just
+     changed under it. */
+  flex: 0 0 32%;
   display: flex;
   flex-direction: column;
   padding: 8px 12px 8px;

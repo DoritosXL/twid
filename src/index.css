@@ -245,9 +245,12 @@ h1 {
 }
 
 .daycanvas {
-  flex: 1 1 110px;
-  min-width: 100px;
-  min-height: 120px;
+  /* Bigger than before on purpose: fewer, larger columns per row (all 7
+     days still visible via wrapping) beats cramming toward 7-in-a-row —
+     precise dragging needs a real target, not a sliver. */
+  flex: 1 1 145px;
+  min-width: 135px;
+  min-height: 145px;
   display: flex;
   flex-direction: column;
   border-right: 1.5px solid var(--line);
@@ -264,8 +267,8 @@ h1 {
   padding: 5px 2px 4px;
   border-bottom: 3px solid var(--line);
 }
-.daycanvas .colhead h2 { font-size: 11px; }
-.daycanvas .colhead .date { font-size: 9px; font-weight: 600; color: var(--ink-soft); }
+.daycanvas .colhead h2 { font-size: 12.5px; }
+.daycanvas .colhead .date { font-size: 10px; font-weight: 600; color: var(--ink-soft); }
 
 .daycanvas.mon .colhead { border-bottom-color: var(--mon-accent); } .daycanvas.mon { --accent-bg: var(--mon-bg); }
 .daycanvas.tue .colhead { border-bottom-color: var(--tue-accent); } .daycanvas.tue { --accent-bg: var(--tue-bg); }
@@ -324,16 +327,16 @@ h1 {
    point — the chip's center sits exactly where it was released. */
 .card.note {
   position: absolute;
-  width: 40px;
+  width: 48px;
   transform: translate(-50%, -50%);
   justify-content: center;
-  padding: 5px 3px;
+  padding: 6px 4px;
   z-index: 1;
 }
 .card.note .itemtext {
   width: auto;
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   padding: 1px 0;
 }
 

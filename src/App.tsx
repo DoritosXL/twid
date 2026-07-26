@@ -115,7 +115,16 @@ export default function App() {
 
       <InfoDialog open={infoOpen} onClose={() => setInfoOpen(false)} />
 
-      <DragOverlay>
+      {/* dropAnimation={null}: dnd-kit's default drop animation eases the
+          overlay back toward the dragged element's *current* DOM rect —
+          for a sortable list that's fine, but for our freeform placement
+          that rect is still the pre-drop position (React hasn't
+          re-rendered the new placement yet), so the default animation
+          visibly snapped the chip toward the wrong spot for an instant
+          before the real one appeared elsewhere. Disabling it lets the
+          overlay simply vanish the moment the real chip is painted in
+          its new spot — no snap, no mismatch, just "it stays put." */}
+      <DragOverlay dropAnimation={null}>
         {activeItem ? (
           <div className={`card${activeIsNote ? " note" : ""} ghost-inner${overId ? "" : " ghost-void"}`}>
             <input type="text" className="itemtext" value={activeItem.text} readOnly maxLength={MAX_CHARS} />

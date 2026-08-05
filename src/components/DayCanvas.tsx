@@ -9,21 +9,10 @@ interface DayCanvasProps {
   isToday: boolean;
   items: TaskItem[];
   assignments: Assignments;
-  deleteMode: boolean;
   onTextChange: (id: string, text: string) => void;
-  onDelete: (id: string) => void;
 }
 
-export function DayCanvas({
-  day,
-  date,
-  isToday,
-  items,
-  assignments,
-  deleteMode,
-  onTextChange,
-  onDelete,
-}: DayCanvasProps) {
+export function DayCanvas({ day, date, isToday, items, assignments, onTextChange }: DayCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: day.key });
   const dayItems = items.filter((it) => assignments[it.id]?.day === day.key);
 
@@ -44,9 +33,7 @@ export function DayCanvas({
               key={item.id}
               item={item}
               placement={assignments[item.id]}
-              deleteMode={deleteMode}
               onTextChange={onTextChange}
-              onDelete={onDelete}
             />
           ))
         )}

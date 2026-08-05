@@ -1,20 +1,15 @@
+import { Bin } from "./Bin";
+
 interface HeaderProps {
   weekRangeText: string;
-  remember: boolean;
-  onRememberChange: (remember: boolean) => void;
-  deleteMode: boolean;
-  onToggleDeleteMode: () => void;
+  onAddTasks: () => void;
+  onReset: () => void;
   onOpenInfo: () => void;
 }
 
-export function Header({
-  weekRangeText,
-  remember,
-  onRememberChange,
-  deleteMode,
-  onToggleDeleteMode,
-  onOpenInfo,
-}: HeaderProps) {
+/** The week screen's top strip — deliberately the only thing above the
+ *  calendar, which gets all the remaining height. */
+export function Header({ weekRangeText, onAddTasks, onReset, onOpenInfo }: HeaderProps) {
   return (
     <header className="top">
       <div className="brand">
@@ -25,30 +20,24 @@ export function Header({
       </div>
 
       <div className="topctrls">
-        <button type="button" className="infobtn" aria-label="How this works" onClick={onOpenInfo}>
-          i
-        </button>
+        <Bin />
 
-        <label
-          className="remember"
-          title="When checked, next week keeps this week's layout. When unchecked, every new week starts empty again."
-        >
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => onRememberChange(e.target.checked)}
-          />
-          <span>Remember layout</span>
-        </label>
+        <button type="button" className="iconbtn" aria-label="Add more tasks" title="Add more tasks" onClick={onAddTasks}>
+          +
+        </button>
 
         <button
           type="button"
-          className={`deletebtn${deleteMode ? " armed" : ""}`}
-          aria-pressed={deleteMode}
-          title="Tap on to arm — then tap any task to delete it."
-          onClick={onToggleDeleteMode}
+          className="iconbtn"
+          aria-label="Start completely from scratch"
+          title="Start completely from scratch"
+          onClick={onReset}
         >
-          Delete
+          ↺
+        </button>
+
+        <button type="button" className="iconbtn infobtn" aria-label="How this works" onClick={onOpenInfo}>
+          i
         </button>
       </div>
     </header>

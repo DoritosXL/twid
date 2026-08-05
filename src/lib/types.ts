@@ -1,5 +1,9 @@
 export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 
+/** The app is a two-screen flow: first you write the week's tasks down,
+ *  then you place them across the days. */
+export type Screen = "capture" | "week";
+
 export interface TaskItem {
   id: string;
   text: string;
@@ -19,7 +23,7 @@ export type Assignments = Record<string, Placement>;
 export interface TwidState {
   items: TaskItem[];
   assignments: Assignments;
-  remember: boolean;
+  screen: Screen;
   /** ISO date (YYYY-MM-DD) of the Monday the current assignments belong to. */
   weekKey: string;
 }

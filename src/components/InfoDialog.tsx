@@ -20,20 +20,23 @@ export function InfoDialog({ open, onClose }: InfoDialogProps) {
       <h2>How twid works</h2>
       <ul>
         <li>
-          <strong>Tasks</strong> — type a task (up to 4 letters) in the strip up top. A fresh
-          blank slot appears automatically so you can keep adding more.
+          <strong>Write your tasks</strong> — one short label per field (up to 4 letters). Tap
+          <strong> + </strong> for another field, then <strong>Go to the week calendar</strong>.
         </li>
         <li>
-          <strong>Placing a task</strong> — drag any task chip onto a day and drop it exactly
-          where you release it.
+          <strong>Everything starts on Monday</strong> — drag each task onto the day you want it
+          on. It lands exactly where you release it; placement is freeform.
         </li>
         <li>
-          <strong>Deleting a task</strong> — drag it off the board entirely to dissolve it, or
-          tap <strong>Delete</strong> in the header to arm delete mode, then tap any chip.
+          <strong>Deleting a task</strong> — drag its chip onto the bin in the top bar and let go.
         </li>
         <li>
-          <strong>Remember layout</strong> — check it to keep this week's placement next week;
-          leave it unchecked and every new week starts with all tasks back in the strip.
+          <strong>Add more tasks</strong> — the <strong>+</strong> in the top bar takes you back to
+          the task list; anything new lands on Monday too.
+        </li>
+        <li>
+          <strong>Start from scratch</strong> — <strong>↺</strong> clears every task and placement
+          and returns you to an empty task list.
         </li>
       </ul>
       <button type="button" className="infoclose" onClick={onClose}>

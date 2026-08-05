@@ -5,36 +5,22 @@ import type { Placement, TaskItem } from "../lib/types";
 
 interface TaskChipProps {
   item: TaskItem;
-  placement?: Placement;
-  deleteMode: boolean;
+  placement: Placement;
   onTextChange: (id: string, text: string) => void;
-  onDelete: (id: string) => void;
 }
 
-export function TaskChip({ item, placement, deleteMode, onTextChange, onDelete }: TaskChipProps) {
-  const isNote = !!placement;
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: item.id,
-    data: { isNote },
-  });
+export function TaskChip({ item, placement, onTextChange }: TaskChipProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: item.id });
 
-  const style: CSSProperties = placement
-    ? { left: `${placement.x}%`, top: `${placement.y}%` }
-    : {};
+  const style: CSSProperties = { left: `${placement.x}%`, top: `${placement.y}%` };
 
   return (
     <div
       ref={setNodeRef}
-      className={`card${isNote ? " note" : ""}${isDragging ? " dragging-source" : ""}`}
+      className={`card note${isDragging ? " dragging-source" : ""}`}
       style={style}
       {...attributes}
       {...listeners}
-      onPointerDownCapture={(e) => {
-        if (deleteMode) e.preventDefault(); // block native input focus while armed
-      }}
-      onClick={() => {
-        if (deleteMode) onDelete(item.id);
-      }}
     >
       <input
         type="text"

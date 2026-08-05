@@ -14,20 +14,25 @@ and place each one on the day it belongs to.
 
 ## How it works
 
-- **Tasks** live in a strip at the top. Type a task (max 4 characters) and a
-  fresh empty slot appears automatically — the list only grows on its own;
-  nothing is ever removed except by you.
-- **The week table** below shows all 7 days. Drag a task chip from the Tasks
-  strip onto a day and drop it exactly where you like — placement is
+It's two screens, in that order.
+
+- **Write the week down.** You start with a single field. Type into it (max 4
+  characters — short labels stay readable on the board) and a **+** appears to
+  add another; Enter does the same. As soon as something is written down, **Go
+  to the week calendar** takes you across.
+- **Place it.** The calendar gets ~90% of the screen, with a slim strip of
+  controls above it. Every task starts on **Monday**; drag each one onto the
+  day you want. A chip lands exactly where you release it — placement is
   freeform, not a snapped-in list.
-- **Drag a chip off the board entirely** and it dissolves (deleted). There's
-  also a **Delete** button in the header: tap it to arm delete mode, then tap
-  any chip to remove it, tap the button again to disarm.
-- **Remember layout**: leave this unchecked and every new week starts with
-  all tasks back in the Tasks strip. Check it and next week keeps the same
-  day placement as this one.
+- **The bin** in the top strip is how you delete: drag a chip onto it and let
+  go. Released anywhere else, a chip just stays where it was.
+- **+** in the top strip goes back to the task list to add more (existing
+  placements are kept; the new tasks land on Monday). **↺** starts completely
+  from scratch, and **i** explains all of this at any time.
+- A new week unschedules everything, so the tasks come back to Monday.
 - Everything is stored in the browser's `localStorage` — there's no backend,
-  no accounts, no network calls (besides an optional Google Font).
+  no accounts, no network calls (besides an optional Google Font). A returning
+  visitor with tasks already written down opens straight on the calendar.
 
 ## Tech
 
@@ -36,13 +41,17 @@ React 19 + TypeScript, built with Vite. Drag-and-drop uses
 and touch, and its activation-distance constraint is what distinguishes a
 tap-to-edit from a drag). Chip placement is computed from the draggable's
 own tracked rect relative to the drop target, not raw event coordinates —
-which is what makes drops land exactly where released, even on touch.
+which is what makes drops land exactly where released, even on touch. (One
+trap: dnd-kit measures draggables with a *transform-agnostic* rect, so chips
+are centred on their drop point with negative margins rather than
+`translate(-50%, -50%)` — a transform there puts the rect dnd-kit reports half
+a chip away from where the chip actually is, and every re-drag drifts.)
 
 ```
 src/
   lib/          pure helpers: date/week math, shared types
   hooks/        useTwidState — state + localStorage persistence + weekly rollover
-  components/   Header, Pool, WeekTable, DayCanvas, TaskChip, InfoDialog
+  components/   CaptureScreen, Header, Bin, WeekTable, DayCanvas, TaskChip, InfoDialog
 ```
 
 ## Running locally

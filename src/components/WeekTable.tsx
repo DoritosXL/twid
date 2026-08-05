@@ -6,12 +6,10 @@ interface WeekTableProps {
   weekKey: string;
   items: TaskItem[];
   assignments: Assignments;
-  deleteMode: boolean;
   onTextChange: (id: string, text: string) => void;
-  onDelete: (id: string) => void;
 }
 
-export function WeekTable({ weekKey, items, assignments, deleteMode, onTextChange, onDelete }: WeekTableProps) {
+export function WeekTable({ weekKey, items, assignments, onTextChange }: WeekTableProps) {
   const dates = weekDates(weekKey);
   const todayStr = isoDate(new Date());
 
@@ -25,9 +23,7 @@ export function WeekTable({ weekKey, items, assignments, deleteMode, onTextChang
           isToday={isoDate(dates[i]) === todayStr}
           items={items}
           assignments={assignments}
-          deleteMode={deleteMode}
           onTextChange={onTextChange}
-          onDelete={onDelete}
         />
       ))}
     </div>

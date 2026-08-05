@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -10,8 +10,8 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { CaptureScreen } from "./components/CaptureScreen";
 import { Header } from "./components/Header";
-import { Pool } from "./components/Pool";
 import { WeekTable } from "./components/WeekTable";
 import { InfoDialog } from "./components/InfoDialog";
 import { MAX_CHARS, PLACE_MAX, PLACE_MIN, useTwidState } from "./hooks/useTwidState";
@@ -19,31 +19,48 @@ import { clamp, formatRange, weekDates } from "./lib/date";
 import type { DayKey, TaskItem } from "./lib/types";
 
 export default function App() {
-  const { state, isFirstVisit, setItemText, deleteItem, placeOnDay, moveToPool, setRemember } =
-    useTwidState();
+  const {
+    state,
+    isFirstVisit,
+    setItemText,
+    addItem,
+    deleteItem,
+    placeOnDay,
+    goToWeek,
+    addMoreTasks,
+    resetAll,
+  } = useTwidState();
 
-  const [deleteMode, setDeleteMode] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(isFirstVisit);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [activeItem, setActiveItem] = useState<TaskItem | null>(null);
-  const [activeIsNote, setActiveIsNote] = useState(false);
   const [overId, setOverId] = useState<string | null>(null);
-
-  useEffect(() => {
-    document.body.classList.toggle("delete-mode", deleteMode);
-  }, [deleteMode]);
+  // The "how this works" popup is worth one unprompted showing — the first
+  // time a new visitor reaches the board, where the dragging happens.
+  const infoShown = useRef(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
   const weekRangeText = "Week of " + formatRange(weekDates(state.weekKey));
-  const poolItems = state.items.filter((it) => !state.assignments[it.id]);
+
+  function handleGoToWeek() {
+    goToWeek();
+    if (isFirstVisit && !infoShown.current) {
+      infoShown.current = true;
+      setInfoOpen(true);
+    }
+  }
+
+  function handleReset() {
+    if (!window.confirm("Start completely from scratch? This clears every task and where you put it.")) return;
+    resetAll();
+  }
 
   function handleDragStart(event: DragStartEvent) {
     const item = state.items.find((it) => it.id === event.active.id);
     if (!item) return;
     setActiveItem(item);
-    setActiveIsNote(!!(event.active.data.current as { isNote?: boolean } | undefined)?.isNote);
     setOverId(null);
   }
 
@@ -56,13 +73,9 @@ export default function App() {
     setActiveItem(null);
     setOverId(null);
 
-    if (!over) {
-      // Dropped outside the board entirely — dissolve it.
+    if (!over) return; // released on nothing — the chip just stays put
+    if (over.id === "bin") {
       deleteItem(String(active.id));
-      return;
-    }
-    if (over.id === "pool") {
-      moveToPool(String(active.id));
       return;
     }
 
@@ -77,6 +90,21 @@ export default function App() {
     placeOnDay(String(active.id), over.id as DayKey, x, y);
   }
 
+  if (state.screen === "capture") {
+    return (
+      <>
+        <CaptureScreen
+          items={state.items}
+          onTextChange={setItemText}
+          onAdd={addItem}
+          onGoToWeek={handleGoToWeek}
+          onOpenInfo={() => setInfoOpen(true)}
+        />
+        <InfoDialog open={infoOpen} onClose={() => setInfoOpen(false)} />
+      </>
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -88,27 +116,17 @@ export default function App() {
       <div className="wrap">
         <Header
           weekRangeText={weekRangeText}
-          remember={state.remember}
-          onRememberChange={setRemember}
-          deleteMode={deleteMode}
-          onToggleDeleteMode={() => setDeleteMode((v) => !v)}
+          onAddTasks={addMoreTasks}
+          onReset={handleReset}
           onOpenInfo={() => setInfoOpen(true)}
         />
 
         <div className="boardwrap">
-          <Pool
-            items={poolItems}
-            deleteMode={deleteMode}
-            onTextChange={setItemText}
-            onDelete={deleteItem}
-          />
           <WeekTable
             weekKey={state.weekKey}
             items={state.items}
             assignments={state.assignments}
-            deleteMode={deleteMode}
             onTextChange={setItemText}
-            onDelete={deleteItem}
           />
         </div>
       </div>
@@ -126,7 +144,7 @@ export default function App() {
           its new spot — no snap, no mismatch, just "it stays put." */}
       <DragOverlay dropAnimation={null}>
         {activeItem ? (
-          <div className={`card${activeIsNote ? " note" : ""} ghost-inner${overId ? "" : " ghost-void"}`}>
+          <div className={`card ghost-chip ghost-inner${overId === "bin" ? " ghost-void" : ""}`}>
             <input type="text" className="itemtext" value={activeItem.text} readOnly maxLength={MAX_CHARS} />
           </div>
         ) : null}

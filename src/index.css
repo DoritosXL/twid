@@ -81,6 +81,12 @@ h1 {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  /* Centred in the leftover space so a lone first field sits in the
+     middle of the screen rather than stranded under the header. `safe`
+     matters: once the list is long enough to scroll, plain `center`
+     would overflow equally both ways and make the top rows
+     unreachable — `safe` drops back to flex-start at that point. */
+  justify-content: safe center;
   gap: 10px;
   padding: 2px 2px 6px;
 }
@@ -390,13 +396,13 @@ h1 {
 .card:active { cursor: grabbing; }
 .card.dragging-source { opacity: .3; }
 
-/* Task chips: one fixed size for all of them (text is capped to 4
+/* Task chips: one fixed size for all of them (text is capped to 5
    chars, so every chip is the same tidy size). `.note` is the one on
    the board, pinned by its drop point so its center sits exactly where
    it was released; `.ghost-chip` is the drag overlay's copy, which
    dnd-kit positions itself and so must not be absolutely placed. */
 .card.note, .card.ghost-chip {
-  width: 48px;
+  width: 56px;
   height: 32px;
   justify-content: center;
   padding: 6px 4px;
@@ -408,8 +414,9 @@ h1 {
      transform-agnostic rect, so a translate would make the rect it
      hands us at drop time disagree with where the chip actually is —
      by exactly half a chip, which is precisely the drift you'd see on
-     every re-drag. Margins are plain layout, so both agree. */
-  margin: -16px 0 0 -24px;
+     every re-drag. Margins are plain layout, so both agree. Keep these
+     at exactly half the size above whenever the chip is resized. */
+  margin: -16px 0 0 -28px;
   z-index: 1;
 }
 .card.note .itemtext, .card.ghost-chip .itemtext {

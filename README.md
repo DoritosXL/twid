@@ -5,18 +5,17 @@ of letting kids build their own mental model of "what happens when" —
 instead of holding the whole week in your head, you write short tasks down
 and place each one on the day it belongs to.
 
-> This branch (`react-rewrite`) is a rebuild of the original static
-> HTML/CSS/JS version (still on `main`) using React + TypeScript + Vite and
-> [dnd-kit](https://dndkit.com/) for drag-and-drop. The original was fully
-> hand-rolled with raw Pointer Events, which worked but accumulated a class
-> of bugs (touch coordinate drift on drop, drag-ghost sizing/positioning)
-> that a proven DnD library solves for free.
+> twid began as a static HTML/CSS/JS app whose drag-and-drop was hand-rolled
+> on raw Pointer Events. It has since been rebuilt on React + TypeScript +
+> Vite with [dnd-kit](https://dndkit.com/). The hand-rolled version worked,
+> but accumulated a class of bugs (touch coordinate drift on drop,
+> drag-ghost sizing/positioning) that a proven DnD library solves for free.
 
 ## How it works
 
 It's two screens, in that order.
 
-- **Write the week down.** You start with a single field. Type into it (max 4
+- **Write the week down.** You start with a single field. Type into it (max 5
   characters — short labels stay readable on the board) and a **+** appears to
   add another; Enter does the same. As soon as something is written down, **Go
   to the week calendar** takes you across.

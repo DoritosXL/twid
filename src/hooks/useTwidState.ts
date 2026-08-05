@@ -3,7 +3,7 @@ import { mondayKey } from "../lib/date";
 import type { Assignments, DayKey, Screen, TaskItem, TwidState } from "../lib/types";
 
 const STORAGE_KEY = "twid:v1";
-export const MAX_CHARS = 4;
+export const MAX_CHARS = 5;
 export const PLACE_MIN = 4;
 export const PLACE_MAX = 96;
 
@@ -12,7 +12,7 @@ export const PLACE_MAX = 96;
  *  instead of stacked on one point. Percentages of the day canvas —
  *  the same coordinate space a real drop writes. The spacing is set so
  *  chips clear each other at phone width (a day canvas is ~170x155
- *  there, and a chip is 48x32); past 12 the grid starts over and they
+ *  there, and a chip is 56x32); past 12 the grid starts over and they
  *  do overlap, but they're all draggable apart from the first frame. */
 const PARK_COLS = [20, 50, 80];
 const PARK_ROWS = [16, 38, 60, 82];

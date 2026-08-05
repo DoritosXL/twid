@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { MAX_CHARS } from "../hooks/useTwidState";
 
 interface InfoDialogProps {
   open: boolean;
@@ -20,7 +21,7 @@ export function InfoDialog({ open, onClose }: InfoDialogProps) {
       <h2>How twid works</h2>
       <ul>
         <li>
-          <strong>Write your tasks</strong> — one short label per field (up to 4 letters). Tap
+          <strong>Write your tasks</strong> — one short label per field (up to {MAX_CHARS} letters). Tap
           <strong> + </strong> for another field, then <strong>Go to the week calendar</strong>.
         </li>
         <li>
